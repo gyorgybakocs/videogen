@@ -1,0 +1,18 @@
+services:
+  ai_app:
+    image: bgds/bgds:svd-base-1.0
+    container_name: svd-app-container
+    volumes:
+      - ./src:/home/appuser/app/src
+      - ./models:/home/appuser/app/models
+      - ./data:/home/appuser/app/data
+      - ./outputs:/home/appuser/app/outputs
+      - ./scripts:/home/appuser/app/scripts
+    entrypoint: ["tail", "-f", "/dev/null"]
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]

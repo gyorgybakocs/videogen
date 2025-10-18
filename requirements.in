@@ -1,0 +1,14 @@
+torch
+torchvision
+torchaudio
+numpy
+einops
+omegaconf
+pytorch-lightning
+kornia
+open-clip-torch
+invisible-watermark
+transformers
+diffusers
+accelerate
+huggingface_hub
