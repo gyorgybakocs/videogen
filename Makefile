@@ -1,19 +1,31 @@
 .PHONY: all build run shell logs stop clean provision help
 
-IMAGE_NAME := my-ai-app
-IMAGE_TAG  := latest
-CONTAINER_NAME := my-ai-app-container
+IMAGE_NAME := bgds/bgds
+IMAGE_TAG  := svd-base-1.0
+CONTAINER_NAME := svd-app-container
 GPU_DEVICE := all
+
+export IMAGE_NAME
+export IMAGE_TAG
+export CONTAINER_NAME
+export GPU_DEVICE
 
 all: build
 
+init:
+	@echo "Initialize the server..."
+	@bash ./scripts/server_init.sh
+
 build:
-	@echo "build docker image: $(IMAGE_NAME):$(IMAGE_TAG)..."
+	@echo "Build docker image: $(IMAGE_NAME):$(IMAGE_TAG)..."
 	@docker compose -f docker-compose-build.yml build
+
+push:
+	@echo "Push docker image: $(IMAGE_NAME):$(IMAGE_TAG)..."
+	@bash ./scripts/push.sh $(IMAGE_NAME):$(IMAGE_TAG)
 
 provision:
 	@echo "download models and some necessary things..."
-	@mkdir -p./models
 	@bash ./scripts/provision.sh ./models
 
 up:

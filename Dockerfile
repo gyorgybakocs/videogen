@@ -1,53 +1,27 @@
-# ===== Builder Stage =====
-FROM nvidia/cuda:11.8.0-devel-ubuntu22.04 AS builder
-
-ARG PYTHON_VERSION=3.10
-ARG VENV_DIR=/opt/venv
+FROM nvidia/cuda:12.6.1-base-ubuntu22.04
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
-    PATH="$VENV_DIR/bin:$PATH"
+    DEBIAN_FRONTEND=noninteractive
 
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
-    python${PYTHON_VERSION} \
-    python${PYTHON_VERSION}-venv \
-    git \
-    ffmpeg \
-    build-essential && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    python3.10 python3-pip \
+    ffmpeg git build-essential \
+ && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-RUN python${PYTHON_VERSION} -m venv $VENV_DIR
-
-COPY requirements.in .
-RUN pip install --no-cache-dir pip-tools
-RUN pip-compile requirements.in
-RUN pip install --no-cache-dir -r requirements.txt
-
-COPY . /app
 WORKDIR /app
 
-# if we have setup.py
-# RUN pip install -e.
+COPY requirements.in ./
+RUN pip3 install --no-cache-dir -U pip pip-tools \
+ && python3 -m piptools compile -o requirements.txt requirements.in \
+ && pip3 install --no-cache-dir -r requirements.txt
 
-# ===== Final Stage =====
-FROM nvidia/cuda:11.8.0-runtime-ubuntu22.04
+COPY . .
 
-ENV VENV_DIR=/opt/venv
-ENV PATH="$VENV_DIR/bin:$PATH"
-
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
-    ffmpeg && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
-
-RUN useradd --create-home appuser
+RUN useradd --create-home --shell /bin/bash appuser \
+ && chown -R appuser:appuser /app
 USER appuser
-WORKDIR /home/appuser/app
 
-COPY --from=builder $VENV_DIR $VENV_DIR
-COPY --from=builder /app .
+ENV PYTHONPATH=/app
 
-CMD ["./run.sh"]
+ENTRYPOINT ["tail", "-f", "/dev/null"]

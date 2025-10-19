@@ -1,7 +1,7 @@
 services:
   ai_app:
-    image: bgds/bgds:svd-base-1.0
-    container_name: svd-app-container
+    image: ${IMAGE_NAME}:${IMAGE_TAG}
+    container_name: ${CONTAINER_NAME}
     volumes:
       - ./src:/home/appuser/app/src
       - ./models:/home/appuser/app/models
@@ -14,5 +14,5 @@ services:
         reservations:
           devices:
             - driver: nvidia
-              count: all
+              count: ${GPU_DEVICE}
               capabilities: [gpu]

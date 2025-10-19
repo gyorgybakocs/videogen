@@ -34,14 +34,6 @@ fi
 
 echo "✅ Upload complete!"
 
-if [ -n "${DOCKER_TOKEN}" ]; then
-    echo "🔑 Docker login for ${DOCKER_USER}..."
-    echo "${DOCKER_TOKEN}" | docker login -u "${DOCKER_USER}" --password-stdin
-    echo "✅ Docker login complete!"
-else
-    echo "⚠️  No Docker token provided, skipping docker login."
-fi
-
 # --- SSH and Setup on Remote ---
 echo "🔧 Setting up on remote instance..."
 ssh $SSH_OPTS $REMOTE_HOST << EOF

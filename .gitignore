@@ -1,3 +1,13 @@
 .idea/
-data/
 scripts/login.sh
+
+data/**
+models/**
+outputs/**
+src/**
+
+!**/.gitkeep
+
+venv/
+*.pyc
+pycache/

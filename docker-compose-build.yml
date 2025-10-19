@@ -2,5 +2,5 @@ services:
   ai_app:
     build:
       context: .
-    image: bgds/bgds:svd-base-1.0
-    container_name: svd-app-container-build
+      dockerfile: Dockerfile
+    image: ${IMAGE_NAME}:${IMAGE_TAG}

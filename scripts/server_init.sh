@@ -9,8 +9,6 @@
 # Exit immediately if a command exits with a non-zero status.
 set -e
 
-source ./login.sh
-
 echo "========================================================================"
 echo "=> 1. Updating system and installing prerequisite packages..."
 echo "========================================================================"
@@ -43,17 +41,7 @@ apt-get update
 apt-get install -y python3-pip
 python3 -m pip install -U huggingface_hub
 hash -r
-huggingface-cli login --token "${HF_TOKEN}"
-hf auth whoami
 
 echo "========================================================================"
 echo "=> INSTALLATION COMPLETE! The system is ready to run 'make mk-build'."
 echo "========================================================================"
-
-echo "========================================================================"
-echo "=> login to docker hub..."
-echo "========================================================================"
-
-echo "🔑 Docker login for ${DOCKER_USER}..."
-echo "${DOCKER_TOKEN}" | docker login -u "${DOCKER_USER}" --password-stdin
-echo "✅ Docker login complete!"
