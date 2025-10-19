@@ -11,7 +11,7 @@ TEMP_CLONE_DIR="temp_clone_$$" # Use a consistent temp dir name based on PID
 # 1. Model Repositories (for Hugging Face)
 SVD_MODEL_REPO="stabilityai/stable-video-diffusion-img2vid-xt"
 MUSETALK_MODEL_REPO="TMElyralab/MuseTalk"
-RIFE_MODEL_REPO="hzwer/Practical-RIFE"
+RIFE_MODEL_URL="https://drive.google.com/uc?export=download&id=1ZKjcbmt1hypiFprJPIKW0Tt0lr_2i7bg"
 # 2. Script Repositories (for Git)
 SVD_SCRIPTS_REPO="https://github.com/Stability-AI/generative-models.git"
 MUSETALK_SCRIPTS_REPO="https://github.com/TMElyralab/MuseTalk.git"
@@ -60,6 +60,49 @@ download_hf_model() {
     hf download "$repo" --local-dir "$target_dir" --quiet
     echo "   Download complete."
   fi
+}
+
+# Downloads and extracts the RIFE model from a direct URL
+download_rife_model() {
+    local url="$1"
+    local target_dir="$2"
+    local zip_file="${target_dir}/rife_models.zip"
+
+    echo "-----------------------------------------------------"
+    echo "-> Checking RIFE model"
+    if dir_exists_and_nonempty "${target_dir}"; then
+        echo "   Model files already exist in '${target_dir}'. Skipping."
+    else
+        echo "   Downloading RIFE model to: ${target_dir}"
+        mkdir -p "${target_dir}"
+        wget -q --show-progress -O "${zip_file}" "${url}"
+        echo "   Unzipping model..."
+        unzip -q "${zip_file}" -d "${target_dir}"
+
+        # The zip file contains a 'train_log' directory with the models.
+        # We want to move its content to our target directory.
+        local model_source_dir="${target_dir}/train_log"
+
+        if [ -d "${model_source_dir}" ]; then
+            echo "   Organizing model files..."
+            # Move all files and directories from train_log to the parent (target_dir)
+            # Use '.*' as well to include hidden files, but exclude '.' and '..'
+            mv "${model_source_dir}"/* "${model_source_dir}"/.* "${target_dir}/" 2>/dev/null || true
+            # Remove the now-empty train_log directory recursively and forcefully
+            rm -rf "${model_source_dir}"
+        else
+            echo "   ERROR: 'train_log' directory not found after unzipping."
+            exit 1
+        fi
+
+        # Clean up macOS specific junk directory if it exists
+        if [ -d "${target_dir}/__MACOSX" ]; then
+            rm -rf "${target_dir}/__MACOSX"
+        fi
+
+        rm "${zip_file}"
+        echo "   Download and extraction complete."
+    fi
 }
 
 download_git_scripts() {
@@ -120,7 +163,7 @@ echo "PART 1: DOWNLOADING AI MODELS"
 echo "====================================================="
 download_hf_model "$SVD_MODEL_REPO"    "${MODELS_DIR}/stable-video-diffusion"
 download_hf_model "$MUSETALK_MODEL_REPO" "${MODELS_DIR}/musetalk"
-download_hf_model "$RIFE_MODEL_REPO"   "${MODELS_DIR}/rife"
+download_rife_model "$RIFE_MODEL_URL"   "${MODELS_DIR}/rife"
 
 # --- PART 2: Download Scripts ---
 echo

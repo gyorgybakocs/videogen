@@ -11,3 +11,5 @@ src/**
 venv/
 *.pyc
 pycache/
+
+*.zip

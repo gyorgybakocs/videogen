@@ -3,11 +3,11 @@ services:
     image: ${IMAGE_NAME}:${IMAGE_TAG}
     container_name: ${CONTAINER_NAME}
     volumes:
-      - ./src:/home/appuser/app/src
-      - ./models:/home/appuser/app/models
-      - ./data:/home/appuser/app/data
-      - ./outputs:/home/appuser/app/outputs
-      - ./scripts:/home/appuser/app/scripts
+      - ./src:/app/src
+      - ./models:/app/models
+      - ./data:/app/data
+      - ./outputs:/app/outputs
+      - ./scripts:/app/scripts
     entrypoint: ["tail", "-f", "/dev/null"]
     deploy:
       resources:

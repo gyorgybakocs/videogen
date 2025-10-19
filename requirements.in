@@ -12,3 +12,4 @@ transformers
 diffusers
 accelerate
 huggingface_hub
+imageio
